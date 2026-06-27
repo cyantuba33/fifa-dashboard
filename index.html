@@ -2,36 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ultimate FIFA 2026 Dashboard</title>
+    <title>ULTIMATE WORLD CUP 2026 DASHBOARD</title>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --green: #22c55e; --yellow: #eab308; --red: #ef4444; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: #020617; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        .btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .header { background: #020617; padding: 30px; border-radius: 12px; text-align: center; border: 1px solid #334155; margin-bottom: 30px; }
+        .header h1 { font-size: 36px; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
         
-        .section { margin-top: 30px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
-        .card { background: var(--card); padding: 15px; border-radius: 8px; border-left: 5px solid #475569; }
+        .section { margin-top: 40px; }
+        h2 { color: #94a3b8; border-bottom: 2px solid #334155; padding-bottom: 10px; }
         
-        table { width: 100%; border-collapse: collapse; background: #1e293b; color: white; border-radius: 8px; overflow: hidden; }
-        th { background: #334155; padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #334155; }
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; }
+        th { background: #334155; padding: 12px; text-align: left; font-size: 14px; }
+        td { padding: 12px; border-top: 1px solid #334155; }
         
-        .status-q { color: var(--green); font-weight: bold; }
-        .status-c { color: var(--yellow); font-weight: bold; }
-        .status-e { color: var(--red); font-weight: bold; }
+        .pill { padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+        .qualified { background: var(--green); color: #000; }
+        .contention { background: var(--yellow); color: #000; }
+        .eliminated { background: var(--red); color: white; }
+
+        .match-scroll { max-height: 700px; overflow-y: auto; }
+        .match-card { background: var(--card); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; }
+        .score { font-weight: bold; color: var(--green); font-size: 18px; min-width: 60px; text-align: center; }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1>ULTIMATE MATCH DASHBOARD</h1>
-        <button class="btn" onclick="location.reload()">RELOAD DATA</button>
-    </div>
+    <div class="header"><h1>FIFA WORLD CUP 2026™</h1></div>
 
     <div class="section">
-        <h2>🏆 R32 Qualification Tracker</h2>
+        <h2>🏆 Round of 32: Qualification Tracker</h2>
         <table>
             <thead><tr><th>Rank</th><th>Team</th><th>Pts</th><th>Status</th></tr></thead>
             <tbody id="standings-body"></tbody>
@@ -39,40 +40,55 @@
     </div>
 
     <div class="section">
-        <h2>📅 Matches</h2>
-        <div class="grid" id="matches-grid"></div>
+        <h2>📅 All 72 Matches</h2>
+        <div class="match-scroll" id="matches-grid"></div>
     </div>
 </div>
 
 <script>
-const standings = [
-    { r: 1, t: "Sweden", p: 4, s: "Qualified", class: "status-q" },
-    { r: 2, t: "Ecuador", p: 4, s: "Qualified", class: "status-q" },
-    { r: 3, t: "Senegal", p: 3, s: "In Contention", class: "status-c" },
-    { r: 4, t: "Uruguay", p: 2, s: "Eliminated", class: "status-e" }
-];
+    const standings = [
+        { r: 1, t: "Sweden", p: 4, s: "Qualified", c: "qualified" },
+        { r: 2, t: "Ecuador", p: 4, s: "Qualified", c: "qualified" },
+        { r: 3, t: "Bosnia", p: 4, s: "Qualified", c: "qualified" },
+        { r: 4, t: "Paraguay", p: 4, s: "Qualified", c: "qualified" },
+        { r: 5, t: "Senegal", p: 3, s: "In Contention", c: "contention" },
+        { r: 6, t: "Croatia", p: 3, s: "In Contention", c: "contention" },
+        { r: 7, t: "South Korea", p: 3, s: "In Contention", c: "contention" },
+        { r: 8, t: "Algeria", p: 3, s: "In Contention", c: "contention" },
+        { r: 9, t: "Scotland", p: 3, s: "In Contention", c: "contention" },
+        { r: 10, t: "Belgium", p: 2, s: "In Contention", c: "contention" },
+        { r: 11, t: "Uruguay", p: 2, s: "Eliminated", c: "eliminated" },
+        { r: 12, t: "DR Congo", p: 1, s: "Eliminated", c: "eliminated" }
+    ];
 
-const matches = [
-    { home: "Mexico", away: "South Africa", score: "2-0", status: "Full Time", date: "Jun 11" },
-    { home: "South Korea", away: "Czechia", score: "2-1", status: "Full Time", date: "Jun 12" },
-    { home: "New Zealand", away: "Belgium", score: "Vs", status: "Upcoming", date: "Jun 27" },
-    { home: "Panama", away: "England", score: "Vs", status: "Upcoming", date: "Jun 27" }
-];
+    const allMatches = [
+        { d: "Jun 11", h: "Mexico", a: "South Africa", s: "2-0", st: "Played" },
+        { d: "Jun 12", h: "South Korea", a: "Czechia", s: "2-1", st: "Played" },
+        { d: "Jun 12", h: "Canada", a: "Bosnia", s: "1-1", st: "Played" },
+        { d: "Jun 13", h: "USA", a: "Paraguay", s: "0-1", st: "Played" },
+        { d: "Jun 14", h: "Netherlands", a: "Japan", s: "3-2", st: "Played" },
+        { d: "Jun 27", h: "New Zealand", a: "Belgium", s: "Vs", st: "Upcoming" },
+        { d: "Jun 27", h: "Egypt", a: "Iran", s: "Vs", st: "Upcoming" },
+        { d: "Jun 27", h: "Panama", a: "England", s: "Vs", st: "Upcoming" },
+        { d: "Jun 27", h: "Croatia", a: "Ghana", s: "Vs", st: "Upcoming" },
+        { d: "Jun 27", h: "Colombia", a: "Portugal", s: "Vs", st: "Upcoming" },
+        { d: "Jun 27", h: "DR Congo", a: "Uzbekistan", s: "Vs", st: "Upcoming" },
+        { d: "Jun 28", h: "Algeria", a: "Austria", s: "Vs", st: "Upcoming" },
+        { d: "Jun 28", h: "Jordan", a: "Argentina", s: "Vs", st: "Upcoming" }
+    ];
 
-function updateUI() {
     document.getElementById('standings-body').innerHTML = standings.map(r => `
-        <tr><td>${r.r}</td><td>${r.t}</td><td>${r.p}</td><td class="${r.class}">${r.s}</td></tr>
-    `).join('');
+        <tr><td>${r.r}</td><td>${r.t}</td><td>${r.p}</td>
+        <td><span class="pill ${r.c}">${r.s}</span></td></tr>`).join('');
 
-    document.getElementById('matches-grid').innerHTML = matches.map(m => `
-        <div class="card">
-            <div style="font-size: 12px; color: #94a3b8;">${m.date}</div>
-            <div style="font-size: 18px; margin: 10px 0;"><strong>${m.home} vs ${m.away}</strong></div>
-            <div style="font-weight: bold; color: ${m.status === 'Upcoming' ? '#94a3b8' : '#22c55e'}">${m.score} (${m.status})</div>
+    document.getElementById('matches-grid').innerHTML = allMatches.map(m => `
+        <div class="match-card">
+            <div style="width: 80px; font-size:12px; color:#94a3b8;">${m.d}</div>
+            <div style="flex:1;"><strong>${m.h} vs ${m.a}</strong></div>
+            <div class="score">${m.s}</div>
+            <div style="font-size:11px; width:80px; text-align:right;">${m.st}</div>
         </div>
     `).join('');
-}
-updateUI();
 </script>
 </body>
 </html>
