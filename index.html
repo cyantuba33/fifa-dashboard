@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA World Cup 2026 Live</title>
+    <style>
+        :root { --primary: #0b2b54; --accent: #1e3a8a; --success: #10b981; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .header { background: var(--primary); color: white; padding: 30px; text-align: center; border-radius: 12px; margin-bottom: 30px; }
+        h2 { border-left: 5px solid var(--accent); padding-left: 15px; color: var(--accent); margin-top: 40px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: var(--accent); color: white; padding: 12px; text-align: left; }
+        td { border: 1px solid #e2e8f0; padding: 12px; }
+        .match-card { background: #fff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .score-box { font-weight: bold; background: #edf2f7; padding: 5px 15px; border-radius: 5px; }
+        .goal { color: #059669; font-weight: bold; }
+        .card { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FIFA World Cup 2026™</h1>
+            <p>Live Hosted Edition</p>
+        </div>
+
+        <h2>🏆 Round of 32 Tracker</h2>
+        <table id="standings-table">
+            <thead><tr><th>Rank</th><th>Team</th><th>Pts</th><th>Status</th></tr></thead>
+            <tbody id="standings-body"></tbody>
+        </table>
+
+        <h2>📅 Match Center</h2>
+        <div id="matches-container"></div>
+    </div>
+
+    <script>
+        const thirdPlaceData = [
+            { rank: 1, team: "Sweden", pts: 4, status: "Qualified" },
+            { rank: 2, team: "Ecuador", pts: 4, status: "Qualified" },
+            { rank: 3, team: "Bosnia and Herz.", pts: 4, status: "Qualified" }
+        ];
+
+        const matches = [
+            { home: "Mexico", away: "South Africa", score: "2-0", events: "⚽ 34' Lozano, ⚽ 78' Giménez" },
+            { home: "South Korea", away: "Czechia", score: "2-1", events: "⚽ 12' Schick, ⚽ 55' Son, 🟥 60' Souček" }
+        ];
+
+        // Populate Standings
+        const sBody = document.getElementById('standings-body');
+        sBody.innerHTML = thirdPlaceData.map(r => `<tr><td>${r.rank}</td><td>${r.team}</td><td>${r.pts}</td><td>${r.status}</td></tr>`).join('');
+
+        // Populate Matches
+        const mContainer = document.getElementById('matches-container');
+        mContainer.innerHTML = matches.map(m => `
+            <div class="match-card">
+                <div><strong>${m.home} vs ${m.away}</strong></div>
+                <div class="score-box">${m.score}</div>
+                <div class="events">${m.events}</div>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>
