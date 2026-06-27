@@ -2,87 +2,84 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIFA World Cup 2026 | Ultimate Master Dashboard</title>
+    <title>Ultimate Match Dashboard</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-        :root { --primary: #0b2b54; --accent: #1e3a8a; --success: #10b981; }
-        body { font-family: 'Poppins', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #0b2b54, #1e3a8a); color: white; padding: 30px; text-align: center; border-radius: 12px; margin-bottom: 30px; }
-        .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 40px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: var(--accent); color: white; padding: 12px; text-align: left; }
-        td { border: 1px solid #e2e8f0; padding: 12px; }
-        tr:nth-child(even) { background: #f8fafc; }
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; }
-        .filter-btn { background: #e2e8f0; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; }
-        .filter-btn.active { background: var(--accent); color: white; }
-        .match-card { display: flex; align-items: center; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
-        .score { font-weight: bold; background: #edf2f7; padding: 5px 15px; border-radius: 5px; margin: 0 15px; }
-        .events { font-size: 13px; color: #4a5568; margin-top: 8px; border-left: 3px solid #cbd5e1; padding-left: 10px; }
+        :root { --bg: #121212; --card: #1e1e1e; --green: #22c55e; --yellow: #eab308; --red: #ef4444; --text: #ffffff; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 40px; text-transform: uppercase; margin: 0; }
+        
+        /* Grid Layout */
+        .live-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-top: 20px; }
+        .card { background: var(--card); border: 1px solid #333; border-radius: 12px; padding: 20px; }
+        
+        /* Color Coding */
+        .status-tag { padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; text-transform: uppercase; }
+        .qualified { background: var(--green); color: #000; }
+        .contention { background: var(--yellow); color: #000; }
+        .eliminated { background: var(--red); color: #fff; }
+
+        table { width: 100%; border-collapse: collapse; background: #1a1a1a; margin-top: 20px; }
+        th { text-align: left; padding: 15px; color: #888; text-transform: uppercase; font-size: 12px; }
+        td { padding: 15px; border-bottom: 1px solid #333; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>FIFA WORLD CUP 2026™</h1>
-            <p>Master Dashboard | Live Data</p>
+            <h1>ULTIMATE MATCH DASHBOARD</h1>
+            <p>Live Edition • Refreshing... <span id="reload-timer">30s</span></p>
         </div>
 
-        <h2 class="section-title">🏆 Round of 32: Third-Place Tracker</h2>
-        <table id="standings-table">
+        <h2 style="color:#aaa;">🏆 Round of 32: Qualification Tracker</h2>
+        <table>
             <thead><tr><th>Rank</th><th>Team</th><th>Pts</th><th>Status</th></tr></thead>
             <tbody id="standings-body"></tbody>
         </table>
 
-        <h2 class="section-title">📅 Match Center</h2>
-        <div class="filter-bar">
-            <button class="filter-btn active" onclick="renderMatches('all', this)">All</button>
-            <button class="filter-btn" onclick="renderMatches('1', this)">Matchday 1</button>
-            <button class="filter-btn" onclick="renderMatches('2', this)">Matchday 2</button>
-            <button class="filter-btn" onclick="renderMatches('3', this)">Matchday 3</button>
-        </div>
-        <div id="matches-container"></div>
+        <h2 style="color:#aaa; margin-top:50px;">🔴 LIVE NOW</h2>
+        <div class="live-grid" id="live-grid"></div>
     </div>
 
     <script>
+        // DATA SOURCE (This is your "Mock API" - easy to edit)
         const standings = [
-            { r: 1, t: "Sweden", p: 4, s: "Qualified" }, { r: 2, t: "Ecuador", p: 4, s: "Qualified" },
-            { r: 3, t: "Bosnia", p: 4, s: "Qualified" }, { r: 4, t: "Paraguay", p: 4, s: "Qualified" },
-            { r: 5, t: "Senegal", p: 3, s: "In Contention" }, { r: 6, t: "Croatia", p: 3, s: "In Contention" },
-            { r: 7, t: "South Korea", p: 3, s: "In Contention" }, { r: 8, t: "Algeria", p: 3, s: "In Contention" },
-            { r: 9, t: "Scotland", p: 3, s: "In Contention" }, { r: 10, t: "Belgium", p: 2, s: "In Contention" },
-            { r: 11, t: "Uruguay", p: 2, s: "Eliminated" }, { r: 12, t: "DR Congo", p: 1, s: "Eliminated" }
+            { r: 1, t: "Sweden", p: 4, s: "Qualified" },
+            { r: 2, t: "Ecuador", p: 4, s: "Qualified" },
+            { r: 3, t: "Senegal", p: 3, s: "In Contention" },
+            { r: 4, t: "Uruguay", p: 2, s: "Eliminated" }
         ];
 
-        const matches = [
-            { md: "1", h: "Mexico", a: "South Africa", s: "2-0", ev: "⚽ 34' Lozano, ⚽ 78' Giménez" },
-            { md: "1", h: "South Korea", a: "Czechia", s: "2-1", ev: "⚽ 12' Schick, ⚽ 55' Son, 🟥 60' Souček" },
-            { md: "1", h: "Netherlands", a: "Japan", s: "3-2", ev: "⚽ 5' Mitoma, ⚽ 28' Gakpo, ⚽ 90' Weghorst" },
-            { md: "2", h: "Brazil", a: "Haiti", s: "1-0", ev: "⚽ 40' Neymar" },
-            { md: "2", h: "England", a: "Ghana", s: "2-2", ev: "⚽ 10' Kane, ⚽ 88' Ayew" },
-            { md: "3", h: "Argentina", a: "Jordan", s: "Vs", ev: "Upcoming" }
-            // Note: Add all 72 entries here following the same pattern
+        const liveMatches = [
+            { h: "USA", a: "Japan", score: "4 - 12", status: "36' Live", group: "Group A" },
+            { h: "CRO", a: "GHA", score: "10 - 10", status: "69' Live", group: "Group A" }
         ];
 
-        document.getElementById('standings-body').innerHTML = standings.map(r => `<tr><td>${r.r}</td><td>${r.t}</td><td>${r.p}</td><td>${r.s}</td></tr>`).join('');
+        // RENDER ENGINE
+        function render() {
+            // Populate Standings
+            document.getElementById('standings-body').innerHTML = standings.map(r => `
+                <tr>
+                    <td>${r.r}</td><td>${r.t}</td><td>${r.p}</td>
+                    <td><span class="status-tag ${r.s.toLowerCase().replace('in contention', 'contention')}">${r.s}</span></td>
+                </tr>
+            `).join('');
 
-        function renderMatches(md, btn) {
-            if(btn) {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-            const filtered = md === 'all' ? matches : matches.filter(m => m.md === md);
-            document.getElementById('matches-container').innerHTML = filtered.map(m => `
-                <div class="match-card">
-                    <div><strong>${m.h} vs ${m.a}</strong></div>
-                    <div class="score">${m.s}</div>
-                    <div class="events">${m.ev}</div>
+            // Populate Live Matches
+            document.getElementById('live-grid').innerHTML = liveMatches.map(m => `
+                <div class="card">
+                    <div style="font-size:12px; color:#888;">${m.group} • ${m.status}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0;">
+                        <span style="font-size:20px;">${m.h}</span>
+                        <span style="font-size:30px; font-weight:bold; color:var(--green);">${m.score}</span>
+                        <span style="font-size:20px;">${m.a}</span>
+                    </div>
                 </div>
             `).join('');
         }
-        renderMatches('all');
+        
+        render();
     </script>
 </body>
 </html>
