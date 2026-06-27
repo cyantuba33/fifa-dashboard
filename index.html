@@ -2,103 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ULTIMATE FIFA 2026 DASHBOARD</title>
+    <title>Ultimate FIFA 2026 Dashboard</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --green: #22c55e; --yellow: #eab308; --red: #ef4444; --accent: #3b82f6; }
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --green: #22c55e; --yellow: #eab308; --red: #ef4444; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: auto; }
-        .header { background: #020617; padding: 30px; border-radius: 12px; text-align: center; border: 1px solid #334155; }
-        .header h1 { font-size: 36px; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        .btn-refresh { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: #020617; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         
-        .section { margin-top: 40px; }
-        h2 { border-bottom: 2px solid #334155; padding-bottom: 10px; color: #94a3b8; }
+        .section { margin-top: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        .card { background: var(--card); padding: 15px; border-radius: 8px; border-left: 5px solid #475569; }
         
-        .table-wrap { overflow-x: auto; background: var(--card); padding: 20px; border-radius: 10px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; color: #94a3b8; font-size: 14px; }
-        td { padding: 12px; border-top: 1px solid #334155; }
+        table { width: 100%; border-collapse: collapse; background: #1e293b; color: white; border-radius: 8px; overflow: hidden; }
+        th { background: #334155; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #334155; }
         
-        .status-pill { padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; }
-        .qualified { background: var(--green); color: black; }
-        .contention { background: var(--yellow); color: black; }
-        .eliminated { background: var(--red); color: white; }
-
-        .match-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 20px; }
-        .match-card { background: var(--card); padding: 20px; border-radius: 10px; border: 1px solid #334155; }
-        .score { font-size: 24px; font-weight: bold; color: var(--green); margin: 10px 0; }
-        .event { font-size: 12px; color: #cbd5e1; margin-top: 5px; border-left: 2px solid #475569; padding-left: 8px; }
+        .status-q { color: var(--green); font-weight: bold; }
+        .status-c { color: var(--yellow); font-weight: bold; }
+        .status-e { color: var(--red); font-weight: bold; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1>ULTIMATE MATCH DASHBOARD</h1>
-        <p>Live stats refreshed via Master API</p>
-        <button class="btn-refresh" onclick="location.reload()">REFRESH LIVE DATA</button>
+        <button class="btn" onclick="location.reload()">RELOAD DATA</button>
     </div>
 
     <div class="section">
         <h2>🏆 R32 Qualification Tracker</h2>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Rank</th><th>Team</th><th>Pts</th><th>Status</th></tr></thead>
-                <tbody id="standings-body"></tbody>
-            </table>
-        </div>
+        <table>
+            <thead><tr><th>Rank</th><th>Team</th><th>Pts</th><th>Status</th></tr></thead>
+            <tbody id="standings-body"></tbody>
+        </table>
     </div>
 
     <div class="section">
-        <h2>📅 Match Center</h2>
-        <div class="match-grid" id="matches-grid"></div>
+        <h2>📅 Matches</h2>
+        <div class="grid" id="matches-grid"></div>
     </div>
 </div>
 
 <script>
-    // THE MASTER DATA ENGINE
-    const standings = [
-        { r: 1, t: "Sweden", p: 4, s: "Qualified", c: "qualified" },
-        { r: 2, t: "Ecuador", p: 4, s: "Qualified", c: "qualified" },
-        { r: 3, t: "Bosnia", p: 4, s: "Qualified", c: "qualified" },
-        { r: 4, t: "Paraguay", p: 4, s: "Qualified", c: "qualified" },
-        { r: 5, t: "Senegal", p: 3, s: "In Contention", c: "contention" },
-        { r: 6, t: "Croatia", p: 3, s: "In Contention", c: "contention" },
-        { r: 7, t: "South Korea", p: 3, s: "In Contention", c: "contention" },
-        { r: 8, t: "Algeria", p: 3, s: "In Contention", c: "contention" },
-        { r: 9, t: "Scotland", p: 3, s: "In Contention", c: "contention" },
-        { r: 10, t: "Belgium", p: 2, s: "In Contention", c: "contention" },
-        { r: 11, t: "Uruguay", p: 2, s: "Eliminated", c: "eliminated" },
-        { r: 12, t: "DR Congo", p: 1, s: "Eliminated", c: "eliminated" }
-    ];
+const standings = [
+    { r: 1, t: "Sweden", p: 4, s: "Qualified", class: "status-q" },
+    { r: 2, t: "Ecuador", p: 4, s: "Qualified", class: "status-q" },
+    { r: 3, t: "Senegal", p: 3, s: "In Contention", class: "status-c" },
+    { r: 4, t: "Uruguay", p: 2, s: "Eliminated", class: "status-e" }
+];
 
-    const matches = [
-        { h: "Mexico", a: "South Africa", s: "2 - 0", status: "Full Time", events: "⚽ 34' Lozano, ⚽ 78' Giménez" },
-        { h: "South Korea", a: "Czechia", s: "2 - 1", status: "Full Time", events: "⚽ 55' Son, 🟥 60' Souček" },
-        { h: "New Zealand", a: "Belgium", s: "Vs", status: "Upcoming", events: "None" },
-        { h: "Egypt", a: "Iran", s: "Vs", status: "Upcoming", events: "None" },
-        { h: "Panama", a: "England", s: "Vs", status: "Upcoming", events: "None" },
-        { h: "Croatia", a: "Ghana", s: "Vs", status: "Upcoming", events: "None" }
-    ];
+const matches = [
+    { home: "Mexico", away: "South Africa", score: "2-0", status: "Full Time", date: "Jun 11" },
+    { home: "South Korea", away: "Czechia", score: "2-1", status: "Full Time", date: "Jun 12" },
+    { home: "New Zealand", away: "Belgium", score: "Vs", status: "Upcoming", date: "Jun 27" },
+    { home: "Panama", away: "England", score: "Vs", status: "Upcoming", date: "Jun 27" }
+];
 
-    function init() {
-        // Render Standings
-        document.getElementById('standings-body').innerHTML = standings.map(r => `
-            <tr><td>${r.r}</td><td>${r.t}</td><td>${r.p}</td>
-            <td><span class="status-pill ${r.c}">${r.s}</span></td></tr>
-        `).join('');
+function updateUI() {
+    document.getElementById('standings-body').innerHTML = standings.map(r => `
+        <tr><td>${r.r}</td><td>${r.t}</td><td>${r.p}</td><td class="${r.class}">${r.s}</td></tr>
+    `).join('');
 
-        // Render Matches
-        document.getElementById('matches-grid').innerHTML = matches.map(m => `
-            <div class="card match-card">
-                <div style="color:#94a3b8; font-size:12px;">${m.status}</div>
-                <div style="font-size:18px; margin:10px 0;"><strong>${m.h} vs ${m.a}</strong></div>
-                <div class="score">${m.s}</div>
-                <div class="event">${m.events}</div>
-            </div>
-        `).join('');
-    }
-    init();
+    document.getElementById('matches-grid').innerHTML = matches.map(m => `
+        <div class="card">
+            <div style="font-size: 12px; color: #94a3b8;">${m.date}</div>
+            <div style="font-size: 18px; margin: 10px 0;"><strong>${m.home} vs ${m.away}</strong></div>
+            <div style="font-weight: bold; color: ${m.status === 'Upcoming' ? '#94a3b8' : '#22c55e'}">${m.score} (${m.status})</div>
+        </div>
+    `).join('');
+}
+updateUI();
 </script>
 </body>
 </html>
