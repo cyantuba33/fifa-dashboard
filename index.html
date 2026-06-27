@@ -3,64 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIFA World Cup 2026 Live</title>
+    <title>FIFA World Cup 2026 | Ultimate Master Dashboard</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         :root { --primary: #0b2b54; --accent: #1e3a8a; --success: #10b981; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .header { background: var(--primary); color: white; padding: 30px; text-align: center; border-radius: 12px; margin-bottom: 30px; }
-        h2 { border-left: 5px solid var(--accent); padding-left: 15px; color: var(--accent); margin-top: 40px; }
+        .header { background: linear-gradient(135deg, #0b2b54, #1e3a8a); color: white; padding: 30px; text-align: center; border-radius: 12px; margin-bottom: 30px; }
+        .section-title { font-size: 20px; color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 40px; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th { background: var(--accent); color: white; padding: 12px; text-align: left; }
         td { border: 1px solid #e2e8f0; padding: 12px; }
-        .match-card { background: #fff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .score-box { font-weight: bold; background: #edf2f7; padding: 5px 15px; border-radius: 5px; }
-        .goal { color: #059669; font-weight: bold; }
-        .card { font-weight: bold; }
+        tr:nth-child(even) { background: #f8fafc; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .filter-btn { background: #e2e8f0; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; }
+        .filter-btn.active { background: var(--accent); color: white; }
+        .match-card { display: flex; align-items: center; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
+        .score { font-weight: bold; background: #edf2f7; padding: 5px 15px; border-radius: 5px; margin: 0 15px; }
+        .events { font-size: 13px; color: #4a5568; margin-top: 8px; border-left: 3px solid #cbd5e1; padding-left: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>FIFA World Cup 2026™</h1>
-            <p>Live Hosted Edition</p>
+            <h1>FIFA WORLD CUP 2026™</h1>
+            <p>Master Dashboard | Live Data</p>
         </div>
 
-        <h2>🏆 Round of 32 Tracker</h2>
+        <h2 class="section-title">🏆 Round of 32: Third-Place Tracker</h2>
         <table id="standings-table">
             <thead><tr><th>Rank</th><th>Team</th><th>Pts</th><th>Status</th></tr></thead>
             <tbody id="standings-body"></tbody>
         </table>
 
-        <h2>📅 Match Center</h2>
+        <h2 class="section-title">📅 Match Center</h2>
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="renderMatches('all', this)">All</button>
+            <button class="filter-btn" onclick="renderMatches('1', this)">Matchday 1</button>
+            <button class="filter-btn" onclick="renderMatches('2', this)">Matchday 2</button>
+            <button class="filter-btn" onclick="renderMatches('3', this)">Matchday 3</button>
+        </div>
         <div id="matches-container"></div>
     </div>
 
     <script>
-        const thirdPlaceData = [
-            { rank: 1, team: "Sweden", pts: 4, status: "Qualified" },
-            { rank: 2, team: "Ecuador", pts: 4, status: "Qualified" },
-            { rank: 3, team: "Bosnia and Herz.", pts: 4, status: "Qualified" }
+        const standings = [
+            { r: 1, t: "Sweden", p: 4, s: "Qualified" }, { r: 2, t: "Ecuador", p: 4, s: "Qualified" },
+            { r: 3, t: "Bosnia", p: 4, s: "Qualified" }, { r: 4, t: "Paraguay", p: 4, s: "Qualified" },
+            { r: 5, t: "Senegal", p: 3, s: "In Contention" }, { r: 6, t: "Croatia", p: 3, s: "In Contention" },
+            { r: 7, t: "South Korea", p: 3, s: "In Contention" }, { r: 8, t: "Algeria", p: 3, s: "In Contention" },
+            { r: 9, t: "Scotland", p: 3, s: "In Contention" }, { r: 10, t: "Belgium", p: 2, s: "In Contention" },
+            { r: 11, t: "Uruguay", p: 2, s: "Eliminated" }, { r: 12, t: "DR Congo", p: 1, s: "Eliminated" }
         ];
 
         const matches = [
-            { home: "Mexico", away: "South Africa", score: "2-0", events: "⚽ 34' Lozano, ⚽ 78' Giménez" },
-            { home: "South Korea", away: "Czechia", score: "2-1", events: "⚽ 12' Schick, ⚽ 55' Son, 🟥 60' Souček" }
+            { md: "1", h: "Mexico", a: "South Africa", s: "2-0", ev: "⚽ 34' Lozano, ⚽ 78' Giménez" },
+            { md: "1", h: "South Korea", a: "Czechia", s: "2-1", ev: "⚽ 12' Schick, ⚽ 55' Son, 🟥 60' Souček" },
+            { md: "1", h: "Netherlands", a: "Japan", s: "3-2", ev: "⚽ 5' Mitoma, ⚽ 28' Gakpo, ⚽ 90' Weghorst" },
+            { md: "2", h: "Brazil", a: "Haiti", s: "1-0", ev: "⚽ 40' Neymar" },
+            { md: "2", h: "England", a: "Ghana", s: "2-2", ev: "⚽ 10' Kane, ⚽ 88' Ayew" },
+            { md: "3", h: "Argentina", a: "Jordan", s: "Vs", ev: "Upcoming" }
+            // Note: Add all 72 entries here following the same pattern
         ];
 
-        // Populate Standings
-        const sBody = document.getElementById('standings-body');
-        sBody.innerHTML = thirdPlaceData.map(r => `<tr><td>${r.rank}</td><td>${r.team}</td><td>${r.pts}</td><td>${r.status}</td></tr>`).join('');
+        document.getElementById('standings-body').innerHTML = standings.map(r => `<tr><td>${r.r}</td><td>${r.t}</td><td>${r.p}</td><td>${r.s}</td></tr>`).join('');
 
-        // Populate Matches
-        const mContainer = document.getElementById('matches-container');
-        mContainer.innerHTML = matches.map(m => `
-            <div class="match-card">
-                <div><strong>${m.home} vs ${m.away}</strong></div>
-                <div class="score-box">${m.score}</div>
-                <div class="events">${m.events}</div>
-            </div>
-        `).join('');
+        function renderMatches(md, btn) {
+            if(btn) {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            const filtered = md === 'all' ? matches : matches.filter(m => m.md === md);
+            document.getElementById('matches-container').innerHTML = filtered.map(m => `
+                <div class="match-card">
+                    <div><strong>${m.h} vs ${m.a}</strong></div>
+                    <div class="score">${m.s}</div>
+                    <div class="events">${m.ev}</div>
+                </div>
+            `).join('');
+        }
+        renderMatches('all');
     </script>
 </body>
 </html>
